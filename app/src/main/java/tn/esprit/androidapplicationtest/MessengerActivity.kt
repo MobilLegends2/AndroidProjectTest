@@ -3,10 +3,15 @@ package tn.esprit.androidapplicationtest
 import ChatAdapter
 import android.os.Bundle
 import android.util.Log
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import io.socket.client.IO
+import io.socket.client.Socket
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -39,20 +44,46 @@ class MessengerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMessengerBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var conversationId: String // Store the conversation ID
-
+    private lateinit var socket: Socket
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMessengerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         recyclerView = binding.recyclerView
-
+        val opts = IO.Options()
+        opts.forceNew = true
+        socket = IO.socket("http://10.0.2.2:9090", opts)
+        // Connect to the server
+        socket.connect()
+        socket.on(Socket.EVENT_CONNECT) {
+            Log.d("MessengerActivity", "Socket connected")
+        }.on(Socket.EVENT_DISCONNECT) {
+            Log.d("MessengerActivity", "Socket disconnected")
+        }
         // Retrieve the conversation ID from intent or wherever you get it
         conversationId = intent.getStringExtra("conversationId") ?: ""
         if (conversationId.isBlank()) {
             // Handle the case where conversationId is not available
             return
         }
+        val sendButton = findViewById<ImageView>(R.id.plus)
+        val messageEditText = findViewById<EditText>(R.id.editTextUsername)
+        // Set click listener for send button
+        sendButton.setOnClickListener {
+            val message = messageEditText.text.toString()
+            if (message.isNotEmpty()) {
+                val data = JSONObject()
+                data.put("sender", "65c8d919c7ad0f54a20ac4c5") // Change to your sender ID
+                data.put("content", message)
+                data.put("conversation", conversationId) // Use the conversation ID obtained earlier
 
+                // Emit the message to the server
+                socket.emit("new_message", data)
+
+                // Clear the message text field
+                messageEditText.text.clear()
+            }
+        }
         // Initialize Retrofit and make network call
         val retrofit = Retrofit.Builder()
             .baseUrl("http://10.0.2.2:9090/") // Update with your server URL
@@ -83,6 +114,7 @@ class MessengerActivity : AppCompatActivity() {
             }
         })
 
+
     }
 
     private fun displayMessages(messages: List<Message2>) {
@@ -91,4 +123,5 @@ class MessengerActivity : AppCompatActivity() {
         val adapter = ChatAdapter(messages)
         recyclerView.adapter = adapter
     }
+
 }
