@@ -5,42 +5,48 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
+import tn.esprit.androidapplicationtest.databinding.ChatitemBinding
 
-
-class ContactAdapter (private val messages: List<ChatContact>) :
+class ContactAdapter(private val context: Context, private val conversations: List<Conversation>) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
+    inner class ViewHolder(private val binding: ChatitemBinding) : RecyclerView.ViewHolder(binding.root),
+        View.OnClickListener {
+        init {
+            binding.root.setOnClickListener(this)
+        }
 
-    class ViewHolder(view: View, public val context: Context) : RecyclerView.ViewHolder(view) {
-        val messageText: TextView = view.findViewById(R.id.name)
-        val timeText: TextView = view.findViewById(R.id.lastmessge)
-        val content: LinearLayout = view.findViewById(R.id.content)
-        val photo: ImageView = view.findViewById(R.id.photo)
+        fun bind(conversation: Conversation) {
+            val lastMessage = conversation.messages.lastOrNull()
+            binding.senderName.text = lastMessage?.sender?.name ?: "Unknown"
+            binding.messageContent.text = lastMessage?.content ?: ""
+        }
 
-
+        override fun onClick(view: View) {
+            val position = adapterPosition
+            if (position != RecyclerView.NO_POSITION) {
+                val conversation = conversations[position]
+                val conversationId = conversation._id
+                val intent = Intent(context, MessengerActivity::class.java).apply {
+                    putExtra("conversationId", conversationId)
+                }
+                context.startActivity(intent)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.chatitem, parent, false)
-        return ViewHolder(view,parent.context)
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ChatitemBinding.inflate(inflater, parent, false)
+        return ViewHolder(binding)
     }
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val message = messages[position]
-        holder.messageText.text = message.nom
-        holder.timeText.text = message.lastmessage
-        holder.content.setOnClickListener {
-            val intent = Intent(holder.context, MessengerActivity::class.java)
-            holder.context.startActivity(intent)
-        };
 
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(conversations[position])
     }
 
     override fun getItemCount(): Int {
-        return messages.size
+        return conversations.size
     }
 }

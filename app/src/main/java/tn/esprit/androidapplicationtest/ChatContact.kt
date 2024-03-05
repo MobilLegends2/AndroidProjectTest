@@ -1,7 +1,7 @@
 package tn.esprit.androidapplicationtest
 
 data class ChatContact(
-    val nom: String,
-    val lastmessage: String,
-    val isRead: Boolean,
+    val senderName: String,
+    val messageContent: String,
+    val isRead: Boolean // Assuming this flag indicates whether the message is read or not
 )
