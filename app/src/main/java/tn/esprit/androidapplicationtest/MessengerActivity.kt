@@ -50,6 +50,7 @@ class MessengerActivity : AppCompatActivity() {
         binding = ActivityMessengerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         recyclerView = binding.recyclerView
+
         val opts = IO.Options()
         opts.forceNew = true
         socket = IO.socket("http://10.0.2.2:9090", opts)
@@ -82,6 +83,8 @@ class MessengerActivity : AppCompatActivity() {
 
                 // Clear the message text field
                 messageEditText.text.clear()
+                refreshMessages()
+
             }
         }
         // Initialize Retrofit and make network call
@@ -116,7 +119,36 @@ class MessengerActivity : AppCompatActivity() {
 
 
     }
+    private fun refreshMessages() {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:9090/") // Update with your server URL
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        // Fetch the messages from the server again and update the RecyclerView
+        val service = retrofit.create(MessageService::class.java)
+        service.getMessages(conversationId).enqueue(object : Callback<Conversation2> {
+            override fun onResponse(
+                call: Call<Conversation2>,
+                response: Response<Conversation2>
+            ) {
+                if (response.isSuccessful) {
+                    val conversation = response.body()
+                    conversation?.let {
+                        Log.d("MessengerActivity", "Number of messages received: ${conversation.messages.size}")
+                        displayMessages(conversation.messages)
+                    }
+                } else {
+                    Log.e("MessengerActivity", "Failed to fetch messages: ${response.code()}")
+                    Toast.makeText(this@MessengerActivity, "Failed to fetch messages", Toast.LENGTH_SHORT).show()
+                }
+            }
 
+            override fun onFailure(call: Call<Conversation2>, t: Throwable) {
+                Log.e("MessengerActivity", "Network Error: ${t.message}")
+                Toast.makeText(this@MessengerActivity, "Network Error", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
     private fun displayMessages(messages: List<Message2>) {
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
