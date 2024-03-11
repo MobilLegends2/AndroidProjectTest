@@ -47,15 +47,18 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize Retrofit and make network call
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:9090/") // Update with your server URL
+            .baseUrl("http://10.0.2.2:9090") // Update with your server URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
+
         val service = retrofit.create(ConversationService::class.java)
         service.getConversations().enqueue(object : Callback<List<Conversation>> {
+
             override fun onResponse(
                 call: Call<List<Conversation>>,
                 response: Response<List<Conversation>>
+
             ) {
                 if (response.isSuccessful) {
                     val conversations = response.body()
