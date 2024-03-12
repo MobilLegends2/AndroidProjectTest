@@ -78,6 +78,16 @@
             </LinearLayout>
 
             <ImageView
+                android:id="@+id/attachmentDisplayButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="150dp"
+                android:src="@drawable/baseline_attach_file_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/photo"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginStart="150dp"
@@ -123,18 +133,28 @@
 
             android:background="@color/white"
             app:layout_constraintBottom_toBottomOf="parent">
+
             <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="250dp"
-                android:layout_height="60dp"
                 android:id="@+id/editTextUsername"
+                android:layout_width="246dp"
+                android:layout_height="60dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginBottom="10dp"
+                android:background="@drawable/custom_textfield"
+                android:drawableLeft="@drawable/ic_emoji_icon"
+                android:drawableRight="@drawable/baseline_attach_file_24"
                 android:hint="   Type your message .."
                 android:padding="10dp"
-                android:background="@drawable/custom_textfield"
-                android:textColor="@android:color/black"
-                android:drawableLeft="@drawable/ic_emoji_icon"
-                android:drawableRight="@drawable/baseline_attach_file_24"/>
+                android:textColor="@android:color/black" />
+
+            <!-- Add ID to the attachment button drawable -->
+            <ImageView
+                android:id="@+id/attachmentButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_attach_file_24"
+                android:visibility="gone" />
+
             <ImageView
                 android:id="@+id/voicemessage"
                 android:layout_width="50dp"
