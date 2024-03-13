@@ -262,9 +262,12 @@ class MessengerActivity : AppCompatActivity() {
     private fun displayMessages(messages: List<Message2>) {
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
-        val adapter = ChatAdapter(messages)
+        // Inside MessengerActivity onCreate method after getting conversationId
+        val adapter = ChatAdapter(messages, currentUserId)
         recyclerView.adapter = adapter
+
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_PICK_FILE && resultCode == Activity.RESULT_OK) {
