@@ -5,7 +5,7 @@
         android:color="@color/softgray"/>
     <gradient
         android:startColor="@color/white"
-        android:endColor="@color/darkblue"
+        android:endColor="@color/lightblue"
         android:type="linear"
         android:angle="90"/>
     <corners

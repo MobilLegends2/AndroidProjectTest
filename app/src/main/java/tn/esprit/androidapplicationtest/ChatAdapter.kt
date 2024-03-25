@@ -1,9 +1,12 @@
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.card.MaterialCardView
+import com.google.android.material.imageview.ShapeableImageView
 import tn.esprit.androidapplicationtest.Message2
 import tn.esprit.androidapplicationtest.R
 
@@ -15,12 +18,12 @@ class ChatAdapter(private val messages: List<Message2>, private val currentUserI
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         // Views for the left side layout (received messages)
-        val messageTextLeft: TextView = view.findViewById(R.id.textMessage_left)
-        val timeTextLeft: TextView = view.findViewById(R.id.heure_left)
-        val photo: ImageView = view.findViewById(R.id.photo_left)
-        // Views for the right side layout (sent messages)
-        val messageTextRight: TextView = view.findViewById(R.id.textMessage_right)
-        val timeTextRight: TextView = view.findViewById(R.id.heure_right)
+        val messageText: TextView = view.findViewById(R.id.textMessage)
+        val timeText: TextView = view.findViewById(R.id.heure)
+        val hide1:  TextView = view.findViewById(R.id.espace1)
+        val hide2:  TextView = view.findViewById(R.id.espace2)
+        val phote: ShapeableImageView = view.findViewById(R.id.photo)
+        val cart: MaterialCardView =view.findViewById(R.id.con)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -30,28 +33,22 @@ class ChatAdapter(private val messages: List<Message2>, private val currentUserI
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val message = messages[position]
+        holder.messageText.text = message.content
+        holder.timeText.text = message.timestamp
 
         if (message.sender == currentUserId) {
             // Message sent by the current user
-            holder.photo.visibility = View.INVISIBLE
-            holder.messageTextRight.visibility = View.VISIBLE
-            holder.timeTextRight.visibility = View.VISIBLE
-            holder.messageTextRight.text = message.content
-            holder.timeTextRight.text = message.timestamp
+            holder.hide1.visibility=View.GONE
+            holder.hide2.visibility=View.GONE
+            holder.phote.visibility=View.GONE
+            holder.cart.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.softred))
+        }else
+        {
+            holder.hide1.visibility=View.VISIBLE
+            holder.hide2.visibility=View.VISIBLE
+            holder.phote.visibility=View.VISIBLE
+            holder.cart.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.msgC))
 
-            // Hide views for the left side layout
-            holder.messageTextLeft.visibility = View.GONE
-            holder.timeTextLeft.visibility = View.GONE
-        } else {
-            // Message received from other users
-            holder.messageTextLeft.visibility = View.VISIBLE
-            holder.timeTextLeft.visibility = View.VISIBLE
-            holder.messageTextLeft.text = message.content
-            holder.timeTextLeft.text = message.timestamp
-
-            // Hide views for the right side layout
-            holder.messageTextRight.visibility = View.GONE
-            holder.timeTextRight.visibility = View.GONE
         }
     }
 
