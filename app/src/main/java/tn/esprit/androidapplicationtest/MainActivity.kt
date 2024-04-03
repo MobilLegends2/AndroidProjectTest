@@ -1,4 +1,3 @@
-// MainActivity.kt
 package tn.esprit.androidapplicationtest
 
 import android.os.Bundle
@@ -13,10 +12,10 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import tn.esprit.androidapplicationtest.databinding.ActivityMainBinding
 
 data class Conversation(
     val _id: String,
+    val participants: List<String>,
     val messages: List<Message>
 )
 
@@ -31,26 +30,24 @@ data class Sender(
 )
 
 interface ConversationService {
-    @GET("conversations/")
+    @GET("conversation/participant1")
     fun getConversations(): Call<List<Conversation>>
 }
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
     private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: ContactAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        recyclerView = binding.recyclerView
+        setContentView(R.layout.activity_main)
+        recyclerView = findViewById(R.id.recyclerView)
 
         // Initialize Retrofit and make network call
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:9090") // Update with your server URL
+            .baseUrl("http://10.0.2.2:9090/") // Ensure the URL ends with "/"
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
 
         val service = retrofit.create(ConversationService::class.java)
         service.getConversations().enqueue(object : Callback<List<Conversation>> {
@@ -58,7 +55,6 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(
                 call: Call<List<Conversation>>,
                 response: Response<List<Conversation>>
-
             ) {
                 if (response.isSuccessful) {
                     val conversations = response.body()
@@ -66,6 +62,7 @@ class MainActivity : AppCompatActivity() {
                         Log.d("MainActivity", "Number of conversations received: ${conversations.size}")
                         displayConversations(it)
                     }
+                    Log.d("MainActivity", "Response: $response")
                 } else {
                     Log.e("MainActivity", "Failed to fetch data: ${response.code()}")
                     Toast.makeText(this@MainActivity, "Failed to fetch data", Toast.LENGTH_SHORT).show()
@@ -80,9 +77,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun displayConversations(conversations: List<Conversation>) {
-        val layoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = layoutManager
-        val adapter = ContactAdapter(this, conversations) // Pass context here
+        adapter = ContactAdapter(this, conversations)
+        recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
     }
+
 }

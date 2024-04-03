@@ -19,7 +19,10 @@ class ContactAdapter(private val context: Context, private val conversations: Li
 
         fun bind(conversation: Conversation) {
             val lastMessage = conversation.messages.lastOrNull()
-            binding.senderName.text = lastMessage?.sender?.name ?: "Unknown"
+            val participants = conversation.participants
+            val otherParticipantId = participants.firstOrNull { it != "participant1" }
+            val senderName = otherParticipantId ?: "Unknown"
+            binding.senderName.text = senderName
             binding.messageContent.text = lastMessage?.content ?: ""
         }
 
