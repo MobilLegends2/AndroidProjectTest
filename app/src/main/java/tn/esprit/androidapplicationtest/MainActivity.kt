@@ -24,24 +24,42 @@ data class Message(
     val sender: Sender,
     val content: String
 )
+data class User(
+    val id: Int,
+    val name: String,
+    val imageResourceId: Int // Resource ID for the user's image
+)
+
+val sam = User(5, "Sam", R.drawable.sam)
+val steven = User(7, "Steven", R.drawable.steven)
+val olivia = User(4, "Olivia", R.drawable.olivia)
+val john = User(3, "John", R.drawable.john)
+val greg = User(1, "Greg", R.drawable.greg)
+
+
+val users: List<User> = listOf(sam, steven, olivia, john, greg)
 
 data class Sender(
     val name: String
 )
-
+const val currentUser= "participant2"
 interface ConversationService {
-    @GET("conversation/participant1")
+    @GET("conversation/$currentUser")
     fun getConversations(): Call<List<Conversation>>
 }
 
 class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerViewUser: RecyclerView
     private lateinit var adapter: ContactAdapter
+    private lateinit var adapterUser: UserAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         recyclerView = findViewById(R.id.recyclerView)
+        recyclerViewUser = findViewById(R.id.userIconRecyclerView)
+        displayUsers(users)
 
         // Initialize Retrofit and make network call
         val retrofit = Retrofit.Builder()
@@ -61,6 +79,8 @@ class MainActivity : AppCompatActivity() {
                     conversations?.let {
                         Log.d("MainActivity", "Number of conversations received: ${conversations.size}")
                         displayConversations(it)
+                        Log.d("MainActivity", "Number of users received: ${users.size}")
+
                     }
                     Log.d("MainActivity", "Response: $response")
                 } else {
@@ -77,9 +97,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun displayConversations(conversations: List<Conversation>) {
-        adapter = ContactAdapter(this, conversations)
+        adapter = ContactAdapter(this, conversations )
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
+
+    }
+    private fun displayUsers(users: List<User>) {
+        adapterUser = UserAdapter(this, users)
+        recyclerViewUser.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        recyclerViewUser.adapter = adapterUser
     }
 
 }
