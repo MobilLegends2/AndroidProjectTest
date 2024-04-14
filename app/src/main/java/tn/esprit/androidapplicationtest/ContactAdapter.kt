@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import tn.esprit.androidapplicationtest.databinding.ChatitemBinding
 
+
 class ContactAdapter(private val context: Context, private val conversations: List<Conversation>) :
     RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
@@ -17,14 +18,17 @@ class ContactAdapter(private val context: Context, private val conversations: Li
             binding.root.setOnClickListener(this)
         }
 
+
+
         fun bind(conversation: Conversation) {
             val lastMessage = conversation.messages.lastOrNull()
             val participants = conversation.participants
-            val otherParticipantId = participants.firstOrNull { it != "participant1" }
+            val otherParticipantId = participants.firstOrNull { it != currentUser }
             val senderName = otherParticipantId ?: "Unknown"
             binding.senderName.text = senderName
             binding.messageContent.text = lastMessage?.content ?: ""
         }
+
 
         override fun onClick(view: View) {
             val position = adapterPosition
