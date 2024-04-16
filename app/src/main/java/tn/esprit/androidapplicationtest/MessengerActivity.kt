@@ -110,11 +110,15 @@ class MessengerActivity : AppCompatActivity() {
         }
 
         val sendButton = findViewById<ImageView>(R.id.plus)
+        val videoBtn = findViewById<ImageView>(R.id.videoBtn)
         val messageEditText = findViewById<EditText>(R.id.editTextUsername)
         val attachmentButton = findViewById<ImageView>(R.id.voicemessage)
         val attachmentDisplayButton = findViewById<ImageView>(R.id.attachmentDisplayButton)
         attachmentDisplayButton.setOnClickListener {
             displayAttachments()
+        }
+        videoBtn.setOnClickListener {
+
         }
 // Set click listener for send button
         sendButton.setOnClickListener {
