@@ -26,7 +26,14 @@ class ContactAdapter(private val context: Context, private val conversations: Li
             val otherParticipantId = participants.firstOrNull { it != currentUser }
             val senderName = otherParticipantId ?: "Unknown"
             binding.senderName.text = senderName
-            binding.messageContent.text = lastMessage?.content ?: ""
+
+            if (lastMessage?.content!=null){
+                if(lastMessage.content.length>20){
+                    val truncatedMessage = lastMessage.content.substring(0, 20) + "..."
+                    binding.messageContent.text = truncatedMessage
+                }
+                else binding.messageContent.text = lastMessage.content
+            }else binding.messageContent.text =""
         }
 
 
@@ -35,8 +42,10 @@ class ContactAdapter(private val context: Context, private val conversations: Li
             if (position != RecyclerView.NO_POSITION) {
                 val conversation = conversations[position]
                 val conversationId = conversation._id
+                var sendername = conversation.participants[1]
                 val intent = Intent(context, MessengerActivity::class.java).apply {
                     putExtra("conversationId", conversationId)
+                    putExtra("SENDERNAME",sendername)
                 }
                 context.startActivity(intent)
             }
