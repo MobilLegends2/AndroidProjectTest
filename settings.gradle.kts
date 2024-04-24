@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AndroidApplicationTest"
 include(":app")
- 
+include(":crosschat")
