@@ -100,8 +100,11 @@ class MessengerActivity : AppCompatActivity() {
         }.on(Socket.EVENT_DISCONNECT) {
             Log.d("MessengerActivity", "Socket disconnected")
         }
-
-
+        // Listen for new_message events from the server
+        socket.on("new_message_$conversationId") { args ->
+            // Trigger refreshMessages() when a new message event is received
+            refreshMessages()
+        }
 // Retrieve the conversation ID from intent or wherever you get it
         conversationId = intent.getStringExtra("conversationId") ?: ""
         var sendername =intent.getStringExtra("SENDERNAME") ?: ""
