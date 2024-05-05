@@ -87,52 +87,55 @@ class MessengerActivity : AppCompatActivity() {
         setContentView(binding.root)
         recyclerView = binding.recyclerView
         currentUserId = "65ca634c40ddbaf5e3db9d01"
+
+        // Retrieve the conversation ID from intent or wherever you get it
+        conversationId = intent.getStringExtra("conversationId") ?: ""
+        var sendername = intent.getStringExtra("SENDERNAME") ?: ""
+        if (conversationId.isBlank()) {
+            // Handle the case where conversationId is not available
+            return
+        }
+
+        // Initialize socket and connect when conversationId is available
         val opts = IO.Options()
         opts.forceNew = true
         socket = IO.socket("http://10.0.2.2:9090", opts)
 
         // Connect to the server
         socket.connect()
+
+        // Set socket event listeners when connected
         socket.on(Socket.EVENT_CONNECT) {
             Log.d("MessengerActivity", "Socket connected")
             // Emit join_conversation event when socket connects
             socket.emit("join_conversation", conversationId)
         }.on(Socket.EVENT_DISCONNECT) {
             Log.d("MessengerActivity", "Socket disconnected")
-        }
-        // Listen for new_message events from the server
-        socket.on("new_message_$conversationId") { args ->
+        }.on("new_message_$conversationId") { args ->
             // Trigger refreshMessages() when a new message event is received
             refreshMessages()
         }
-// Retrieve the conversation ID from intent or wherever you get it
-        conversationId = intent.getStringExtra("conversationId") ?: ""
-        var sendername =intent.getStringExtra("SENDERNAME") ?: ""
-        if (conversationId.isBlank()) {
-            // Handle the case where conversationId is not available
-            return
-        }
 
-        var sendernameui =findViewById<TextView>(R.id.personname)
+        // Set up UI and other components
+        var sendernameui = findViewById<TextView>(R.id.personname)
         val sendButton = findViewById<ImageView>(R.id.plus)
-        val moreoption=findViewById<ImageView>(R.id.addd)
+        val moreoption = findViewById<ImageView>(R.id.addd)
         val videoBtn = findViewById<ImageView>(R.id.videoBtn)
         val messageEditText = findViewById<EditText>(R.id.editTextUsername)
+        // Other UI initialization...
 
-        moreoption.setOnClickListener{
+        moreoption.setOnClickListener {
             showMoreOptionDialog()
         }
 
-//       // val attachmentButton = findViewById<ImageView>(R.id.voicemessage)
-        val attachmentDisplayButton = findViewById<ImageView>(R.id.attachmentDisplayButton)
-        sendernameui.text=sendername
-        attachmentDisplayButton.setOnClickListener {
-            displayAttachments()
-        }
-        videoBtn.setOnClickListener {
+//        attachmentDisplayButton.setOnClickListener {
+//            displayAttachments()
+//        }
 
+        videoBtn.setOnClickListener {
+            // Handle video button click
         }
-// Set click listener for send button
+
         sendButton.setOnClickListener {
             val message = messageEditText.text.toString()
             if (message.isNotEmpty()) {
@@ -149,18 +152,6 @@ class MessengerActivity : AppCompatActivity() {
                 refreshMessages()
             }
         }
-
-
-
-
-
-        /////////////////////////////////////////////
-//        attachmentButton.setOnClickListener {
-//            val intent = Intent(Intent.ACTION_GET_CONTENT)
-//            intent.type = "*/*"  // Allow any file type
-//            startActivityForResult(intent, REQUEST_PICK_FILE)
-//        }
-//////////////////////////////////////////////////////////
 
         // Initialize Retrofit and make network call
         val retrofit = Retrofit.Builder()
@@ -192,8 +183,9 @@ class MessengerActivity : AppCompatActivity() {
             }
         })
 
-
+        // Other initialization code...
     }
+
     private fun sendAttachment(filePath: String, conversationId: String) {
         if (File(filePath).exists()) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -302,6 +294,15 @@ class MessengerActivity : AppCompatActivity() {
         val adapter = ChatAdapter(messages, currentUserId)
         recyclerView.adapter = adapter
 
+        // Scroll to the last message position
+        layoutManager.scrollToPositionWithOffset(messages.size - 1, 0)
+    }
+
+    fun LinearLayoutManager.addMessageAndScrollToBottom(recyclerView: RecyclerView, adapter: RecyclerView.Adapter<*>) {
+        recyclerView.post {
+            adapter.notifyItemInserted(adapter.itemCount - 1)
+            recyclerView.scrollToPosition(adapter.itemCount - 1)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
