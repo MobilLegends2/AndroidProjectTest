@@ -12,6 +12,8 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Path
 
 data class Conversation(
     val _id: String,
@@ -51,14 +53,19 @@ data class Sender(
 const val currentUser= "participant2"
 
 interface ConversationService {
-    @GET("conversation/$currentUser")
-    fun getConversations(): Call<List<Conversation>>
+    @GET("conversation/{currentUser}")
+    fun getConversations(
+        @Header("x-secret-key") secretKey: String,
+        @Path("currentUser") currentUser: String
+    ): Call<List<Conversation>>
 }
+
 
 class MainActivity : AppCompatActivity(), ContactAdapter.OnConversationClickListener {
 
     companion object {
-        const val BASE_URL = "http://192.168.1.16:9090/"
+        const val BASE_URL = "http://192.168.1.16:9090/";
+        const val BASE_API_KEY ="80e01067bd82ddb68ce5091bd07c8e1946ef4626";
     }
 
     private lateinit var recyclerView: RecyclerView
@@ -81,7 +88,8 @@ class MainActivity : AppCompatActivity(), ContactAdapter.OnConversationClickList
             .build()
 
         val service = retrofit.create(ConversationService::class.java)
-        service.getConversations().enqueue(object : Callback<List<Conversation>> {
+        service.getConversations(BASE_API_KEY,currentUser).enqueue(object :
+            Callback<List<Conversation>> {
 
             override fun onResponse(
                 call: Call<List<Conversation>>,

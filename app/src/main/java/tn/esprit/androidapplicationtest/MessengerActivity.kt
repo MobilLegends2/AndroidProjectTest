@@ -34,7 +34,9 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Path
+import tn.esprit.androidapplicationtest.MainActivity.Companion.BASE_API_KEY
 import tn.esprit.androidapplicationtest.MainActivity.Companion.BASE_URL
 import tn.esprit.androidapplicationtest.databinding.ActivityMessengerBinding
 import java.io.DataOutputStream
@@ -75,8 +77,12 @@ data class Attachment(
 )
 interface MessageService {
     @GET("conversations/{conversationId}/messages")
-    fun getMessages(@Path("conversationId") conversationId: String): Call<Conversation2>
+    fun getMessages(
+        @Header("x-secret-key") secretKey: String,
+        @Path("conversationId") conversationId: String
+    ): Call<Conversation2>
 }
+
 interface AttachmentService {
     @GET("conversations/{conversationId}/attachments")
     fun getAttachments(@Path("conversationId") conversationId: String): Call<List<Attachment>>
@@ -174,7 +180,7 @@ class MessengerActivity : AppCompatActivity() {
             .build()
 
         val service = retrofit.create(MessageService::class.java)
-        service.getMessages(conversationId).enqueue(object : Callback<Conversation2> {
+        service.getMessages(BASE_API_KEY,conversationId).enqueue(object : Callback<Conversation2> {
             override fun onResponse(
                 call: Call<Conversation2>,
                 response: Response<Conversation2>
@@ -278,7 +284,7 @@ class MessengerActivity : AppCompatActivity() {
             .build()
         // Fetch the messages from the server again and update the RecyclerView
         val service = retrofit.create(MessageService::class.java)
-        service.getMessages(conversationId).enqueue(object : Callback<Conversation2> {
+        service.getMessages(BASE_API_KEY,conversationId).enqueue(object : Callback<Conversation2> {
             override fun onResponse(
                 call: Call<Conversation2>,
                 response: Response<Conversation2>

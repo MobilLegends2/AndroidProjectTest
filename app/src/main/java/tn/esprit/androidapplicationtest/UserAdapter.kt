@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
+import tn.esprit.androidapplicationtest.MainActivity.Companion.BASE_API_KEY
 import tn.esprit.androidapplicationtest.MainActivity.Companion.BASE_URL
 import tn.esprit.androidapplicationtest.databinding.UserIconItemBinding
 import java.io.IOException
@@ -53,6 +54,7 @@ class UserAdapter(private val context: Context, private val users: List<User>) :
 
         val request = Request.Builder()
             .url(url)
+            .addHeader("x-secret-key", BASE_API_KEY)
             .build()
 
         OkHttpClient().newCall(request).enqueue(object : Callback {
