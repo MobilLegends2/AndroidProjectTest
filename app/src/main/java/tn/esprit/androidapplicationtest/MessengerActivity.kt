@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.gson.annotations.SerializedName
 import io.socket.client.IO
 import io.socket.client.Socket
 import kotlinx.coroutines.CoroutineScope
@@ -49,7 +50,10 @@ data class Conversation2(
     val attachments: List<Any>, // Modify this as needed
     val __v: Int
 )
-
+data class DeleteMessageRequest(
+    @SerializedName("messageId") val messageId: String,
+    @SerializedName("userId") val userId: String
+)
 data class Message2(
     val _id: String,
     val sender: String,
@@ -129,7 +133,6 @@ class MessengerActivity : AppCompatActivity() {
         var sendernameui = findViewById<TextView>(R.id.personname)
         val sendButton = findViewById<ImageView>(R.id.plus)
         val moreoption = findViewById<ImageView>(R.id.addd)
-        val videoBtn = findViewById<ImageView>(R.id.videoBtn)
         val messageEditText = findViewById<EditText>(R.id.editTextUsername)
         // Other UI initialization...
 
@@ -141,9 +144,6 @@ class MessengerActivity : AppCompatActivity() {
 //            displayAttachments()
 //        }
 
-        videoBtn.setOnClickListener {
-            // Handle video button click
-        }
 
         sendButton.setOnClickListener {
             val message = messageEditText.text.toString()
@@ -300,7 +300,7 @@ class MessengerActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
         // Inside MessengerActivity onCreate method after getting conversationId
-        val adapter = ChatAdapter(messages, currentUserId)
+        val adapter = ChatAdapter(messages, currentUserId,this)
         recyclerView.adapter = adapter
 
         // Scroll to the last message position
