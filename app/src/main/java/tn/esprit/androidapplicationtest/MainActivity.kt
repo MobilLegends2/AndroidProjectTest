@@ -1,5 +1,5 @@
 package tn.esprit.androidapplicationtest
-
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -21,9 +21,15 @@ data class Conversation(
 
 data class Message(
     val _id: String,
-    val sender: Sender,
-    val content: String
+    val sender: String,
+    val conversation: String,
+    val content: String,
+    val timestamp: String,
+    val emojis: List<String>,
+    val type: String // Assuming you want to include the 'type' field as a String
 )
+
+
 data class User(
     val id: Int,
     val name: String,
@@ -36,19 +42,25 @@ val olivia = User(4, "Olivia", R.drawable.olivia)
 val john = User(3, "John", R.drawable.john)
 val greg = User(1, "Greg", R.drawable.greg)
 
-
 val users: List<User> = listOf(sam, steven, olivia, john, greg)
 
 data class Sender(
     val name: String
 )
+
 const val currentUser= "participant2"
+
 interface ConversationService {
     @GET("conversation/$currentUser")
     fun getConversations(): Call<List<Conversation>>
 }
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ContactAdapter.OnConversationClickListener {
+
+    companion object {
+        const val BASE_URL = "http://192.168.1.16:9090/"
+    }
+
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewUser: RecyclerView
     private lateinit var adapter: ContactAdapter
@@ -59,11 +71,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         recyclerView = findViewById(R.id.recyclerView)
         recyclerViewUser = findViewById(R.id.userIconRecyclerView)
+
         displayUsers(users)
 
         // Initialize Retrofit and make network call
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:9090/") // Ensure the URL ends with "/"
+            .baseUrl(BASE_URL) // Ensure the URL ends with "/"
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -97,15 +110,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun displayConversations(conversations: List<Conversation>) {
-        adapter = ContactAdapter(this, conversations )
+        adapter = ContactAdapter(this, conversations, this)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
-
     }
+
     private fun displayUsers(users: List<User>) {
         adapterUser = UserAdapter(this, users)
         recyclerViewUser.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerViewUser.adapter = adapterUser
     }
 
+
+    override fun onConversationClick(conversationId: String, senderName: String) {
+        val intent = Intent(this, MessengerActivity::class.java)
+        intent.putExtra("conversationId", conversationId)
+        startActivity(intent)
+    }
 }

@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
+import tn.esprit.androidapplicationtest.MainActivity.Companion.BASE_URL
 import tn.esprit.androidapplicationtest.databinding.UserIconItemBinding
 import java.io.IOException
 
@@ -48,7 +49,7 @@ class UserAdapter(private val context: Context, private val users: List<User>) :
     }
     private fun createOrGetConversation(clickedUserId: String, senderName: String, senderImageUrl: Int) {
         val currentUserId = "participant2" // Your current user ID
-        val url = "http://10.0.2.2:9090/conversation/$currentUserId/$senderName"
+        val url = BASE_URL+"conversation/$currentUserId/$senderName"
 
         val request = Request.Builder()
             .url(url)
