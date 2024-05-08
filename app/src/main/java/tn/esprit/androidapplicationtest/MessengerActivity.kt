@@ -32,6 +32,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import tn.esprit.androidapplicationtest.MainActivity.Companion.BASE_URL
 import tn.esprit.androidapplicationtest.databinding.ActivityMessengerBinding
 import java.io.DataOutputStream
 import java.io.File
@@ -87,7 +88,15 @@ class MessengerActivity : AppCompatActivity() {
         setContentView(binding.root)
         recyclerView = binding.recyclerView
         currentUserId = "65ca634c40ddbaf5e3db9d01"
+        val backImageView = findViewById<ImageView>(R.id.backimg)
 
+        backImageView.setOnClickListener {
+            // Navigate to MainActivity
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            // Finish MessengerActivity to remove it from the back stack if you don't want to come back to it
+            finish()
+        }
         // Retrieve the conversation ID from intent or wherever you get it
         conversationId = intent.getStringExtra("conversationId") ?: ""
         var sendername = intent.getStringExtra("SENDERNAME") ?: ""
@@ -99,7 +108,7 @@ class MessengerActivity : AppCompatActivity() {
         // Initialize socket and connect when conversationId is available
         val opts = IO.Options()
         opts.forceNew = true
-        socket = IO.socket("http://10.0.2.2:9090", opts)
+        socket = IO.socket(BASE_URL, opts)
 
         // Connect to the server
         socket.connect()
@@ -155,7 +164,7 @@ class MessengerActivity : AppCompatActivity() {
 
         // Initialize Retrofit and make network call
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:9090/") // Update with your server URL
+            .baseUrl(BASE_URL) // Update with your server URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
@@ -191,7 +200,7 @@ class MessengerActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val fileName = File(filePath).name
-                    val url = URL("http://10.0.2.2:9090/conversations/$conversationId/attachments")
+                    val url = URL(BASE_URL+"/conversations/$conversationId/attachments")
                     val connection = url.openConnection() as HttpURLConnection
                     connection.requestMethod = "POST"
                     connection.doOutput = true
@@ -259,7 +268,7 @@ class MessengerActivity : AppCompatActivity() {
     }
     private fun refreshMessages() {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:9090/") // Update with your server URL
+            .baseUrl(BASE_URL) // Update with your server URL
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         // Fetch the messages from the server again and update the RecyclerView
@@ -336,7 +345,7 @@ class MessengerActivity : AppCompatActivity() {
     private fun displayAttachments() {
         // Create Retrofit instance
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:9090/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
