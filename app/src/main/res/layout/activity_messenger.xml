@@ -77,15 +77,6 @@
                     android:textStyle="normal" />
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/videoBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="15dp"
-                android:src="@drawable/baseline_videocam_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/photo"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/attachmentDisplayButton"
