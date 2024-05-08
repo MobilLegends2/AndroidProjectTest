@@ -5,11 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.imageview.ShapeableImageView
@@ -49,6 +51,7 @@ class ChatAdapter(private val messages: List<Message2>, private val currentUserI
         val hide2:  TextView = view.findViewById(R.id.espace2)
         val phote: ShapeableImageView = view.findViewById(R.id.photo)
         val cart: MaterialCardView =view.findViewById(R.id.con)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -82,8 +85,27 @@ class ChatAdapter(private val messages: List<Message2>, private val currentUserI
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val message = messages[position]
-        holder.messageText.text = message.content
         holder.timeText.text = message.timestamp
+
+        // Check if the message is of type "attachment"
+        if (message.type == "attachment") {
+            // Hide the text message view
+            holder.messageText.visibility = View.GONE
+            // Display the attachment image
+            holder.phote.visibility = View.VISIBLE
+            // Load the attachment image using Glide or any other image loading library
+            Glide.with(holder.itemView)
+                .load(message.content) // Assuming content is the URL of the attachment image
+                .into(holder.phote)
+        } else {
+            // Show the text message view
+            holder.messageText.visibility = View.VISIBLE
+            // Hide the attachment image
+            holder.phote.visibility = View.GONE
+            // Set the text message content
+            holder.messageText.text = message.content
+        }
+
         holder.cart.setOnLongClickListener {
             // Show a context menu for the message
             val popupMenu = PopupMenu(holder.itemView.context, holder.messageText)
@@ -105,27 +127,26 @@ class ChatAdapter(private val messages: List<Message2>, private val currentUserI
             popupMenu.show()
             true // Indicate that the long click event is consumed
         }
+
         if (message.sender == currentUserId) {
             // Message sent by the current user
-            holder.hide1.visibility=View.GONE
-            holder.hide2.visibility=View.GONE
-            holder.phote.visibility=View.GONE
+            holder.hide1.visibility = View.GONE
+            holder.hide2.visibility = View.GONE
             holder.cart.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.softred))
-            if(message.content=="this message has been deleted"){
+            if (message.content == "this message has been deleted") {
                 holder.cart.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.softgray))
             }
-        }else
-        {
-            holder.hide1.visibility=View.VISIBLE
-            holder.hide2.visibility=View.VISIBLE
-            holder.phote.visibility=View.VISIBLE
+        } else {
+            holder.hide1.visibility = View.VISIBLE
+            holder.hide2.visibility = View.VISIBLE
             holder.cart.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.msgC))
-            if(message.content=="this message has been deleted"){
+            if (message.content == "this message has been deleted") {
                 holder.cart.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.softgray))
             }
-
         }
     }
+
+
 
     override fun getItemCount(): Int {
         return messages.size

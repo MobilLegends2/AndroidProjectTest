@@ -1,6 +1,8 @@
 package tn.esprit.androidapplicationtest
 
 import ChatAdapter
+import android.content.Context
+
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -44,6 +46,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 
+
 data class Conversation2(
     val _id: String,
     val messages: List<Message2>,
@@ -60,6 +63,8 @@ data class Message2(
     val conversation: String,
     val content: String,
     val timestamp: String,
+    val type: String,
+
     val __v: Int
 )
 data class Attachment(
@@ -297,14 +302,31 @@ class MessengerActivity : AppCompatActivity() {
         })
     }
     private fun displayMessages(messages: List<Message2>) {
-        val layoutManager = LinearLayoutManager(this)
+        val layoutManager = LinearLayoutManager(this@MessengerActivity)
         recyclerView.layoutManager = layoutManager
-        // Inside MessengerActivity onCreate method after getting conversationId
-        val adapter = ChatAdapter(messages, currentUserId,this)
+
+        val adapter = ChatAdapter(messages, currentUserId, this@MessengerActivity)
         recyclerView.adapter = adapter
 
-        // Scroll to the last message position
         layoutManager.scrollToPositionWithOffset(messages.size - 1, 0)
+    }
+
+
+
+
+
+    private fun displayAttachmentImage(attachmentUrl: String) {
+        // Use Glide or any other image-loading library to load and display the attachment URL as an image
+        val dialogBuilder = AlertDialog.Builder(this)
+        val imageView = ImageView(this)
+        Glide.with(this)
+            .load(attachmentUrl)
+            .into(imageView)
+        dialogBuilder.setView(imageView)
+        dialogBuilder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss()
+        }
+        dialogBuilder.show()
     }
 
     fun LinearLayoutManager.addMessageAndScrollToBottom(recyclerView: RecyclerView, adapter: RecyclerView.Adapter<*>) {
